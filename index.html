@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head><body>
+<title>แบบทดสอบด่วน IC3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one centered answer-sheet column; a progress strip on top, one question card at a time */
+:root{
+  --bg:#f3f5f9; --surface:#ffffff; --ink:#18213a; --muted:#5c6680; --line:#d9dfeb;
+  --accent:#2747c9; --accent-soft:#e6ebfb; --ok:#147a4a; --ok-soft:#e2f4ea; --bad:#b4232c; --bad-soft:#fbe7e8;
+  --font:"IBM Plex Sans Thai",system-ui,"Leelawadee UI",Tahoma,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1424; --surface:#182036; --ink:#e7ebf5; --muted:#9aa4bd; --line:#2b3552;
+  --accent:#8ea4ff; --accent-soft:#232f57; --ok:#5fd39a; --ok-soft:#173a2b; --bad:#ff8a90; --bad-soft:#44202a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1424; --surface:#182036; --ink:#e7ebf5; --muted:#9aa4bd; --line:#2b3552;
+  --accent:#8ea4ff; --accent-soft:#232f57; --ok:#5fd39a; --ok-soft:#173a2b; --bad:#ff8a90; --bad-soft:#44202a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+.wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{margin:0;font-size:28px;line-height:1.25;text-wrap:balance}
+.sub{margin:0;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.controls label{font-size:14px;color:var(--muted)}
+select,button{font:inherit}
+select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.btn{padding:10px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--surface);font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,select:focus-visible,.opt:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.progress{display:flex;gap:4px}
+.progress span{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.progress span.ok{background:var(--ok)} .progress span.bad{background:var(--bad)} .progress span.cur{background:var(--accent)}
+.meta{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.tag{align-self:flex-start;font-size:12px;padding:2px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+.q{margin:0;font-size:19px;font-weight:600;line-height:1.5}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .k{font-family:var(--mono);font-size:13px;min-width:26px;height:26px;border-radius:6px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);flex:none}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)} .opt.ok .k{background:var(--ok);color:var(--surface)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)} .opt.bad .k{background:var(--bad);color:var(--surface)}
+.opt:disabled{cursor:default}
+.explain{padding:12px 14px;border-radius:10px;background:var(--bg);font-size:15px}
+.explain b.ok{color:var(--ok)} .explain b.bad{color:var(--bad)}
+.nav{display:flex;justify-content:flex-end}
+.result{text-align:center;align-items:center}
+.score{font-size:56px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:var(--accent)}
+.review{display:flex;flex-direction:column;gap:8px;text-align:left;width:100%}
+.review div{padding:10px 12px;border-radius:8px;border-left:4px solid var(--bad);background:var(--bad-soft);font-size:14px}
+.foot{font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">เตรียมสอบ IC3 · ดิจิทัล + AI</span>
+    <h1>แบบทดสอบด่วน</h1>
+    <p class="sub">สุ่มข้อและสลับตัวเลือกใหม่ทุกครั้ง ตอบแล้วเห็นเฉลยทันที</p>
+  </header>
+
+  <div class="controls">
+    <label for="topic">หมวด</label>
+    <select id="topic"></select>
+    <label for="count">จำนวนข้อ</label>
+    <select id="count"><option>5</option><option selected>10</option><option>20</option></select>
+    <button class="btn" id="start">สุ่มชุดใหม่</button>
+  </div>
+
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <div class="meta"><span id="pos"></span><span id="live"></span></div>
+  <div id="stage"></div>
+  <p class="foot" id="best"></p>
+</div>
+
+<script>
+// [หมวด, คำถาม, [ถูก, ผิด, ผิด, ผิด], คำอธิบาย] — เนื้อหาจากภาพอินโฟกราฟิก IC3 13 ภาพ
+const T={d1:"ดิจิทัล ข้อ 1",d2:"ดิจิทัล ข้อ 2",d3:"ดิจิทัล ข้อ 3",ai:"AI"};
+const BANK=[
+["d1","Voicemail คืออะไร",["ระบบฝากข้อความเสียงเมื่อผู้รับไม่รับสาย","ข้อความตัวอักษรสั้น","การแชร์อินเทอร์เน็ตจากมือถือ","แอปส่งข้อความทันที"],"Voicemail ให้ผู้โทรฝากข้อความเสียงไว้ได้"],
+["d1","ข้อใดคือความแตกต่างของ MMS เทียบกับ SMS",["MMS ส่งภาพ วิดีโอ และเสียงได้","MMS ส่งได้เฉพาะตัวอักษร","MMS ใช้ได้ทุกเครื่องโดยไม่ต้องรองรับ","MMS มีขนาดเล็กกว่า SMS"],"SMS ส่งตัวอักษร ส่วน MMS ส่งสื่อมัลติมีเดียได้ ขนาดใหญ่กว่า"],
+["d1","LINE, Messenger, WhatsApp จัดเป็นบริการประเภทใด",["Instant Messaging","Voicemail","SMS","Cloud Storage"],"Instant Messaging คือการส่งข้อความแบบเรียลไทม์ผ่านอินเทอร์เน็ต"],
+["d1","Mobile Hotspot ใช้ทำอะไร",["แบ่งปันอินเทอร์เน็ตจากมือถือให้อุปกรณ์อื่น","เชื่อมต่อหูฟังไร้สาย","สำรองข้อมูลขึ้นคลาวด์","ป้องกันไวรัส"],"Hotspot ทำให้มือถือเป็นจุดปล่อยอินเทอร์เน็ต"],
+["d1","การเชื่อมต่อแบบใดเหมาะกับหูฟังหรือลำโพงไร้สายระยะใกล้",["Bluetooth","Ethernet","VGA","Cellular"],"Bluetooth ใช้เชื่อมต่ออุปกรณ์ระยะใกล้"],
+["d1","ข้อเสียของสมาร์ตโฟนตามสรุปคือข้อใด",["หน้าจอเล็ก แบตหมดไว","หนักและราคาสูง","ทำงานบางอย่างไม่ได้เท่าคอมพิวเตอร์","อัปเกรดไม่ได้"],"สมาร์ตโฟนพกพาง่าย แต่จอเล็กและแบตหมดไว"],
+["d1","หน่วยความจำใดที่ข้อมูลหายเมื่อปิดเครื่อง",["RAM","SSD","HDD","Memory Card"],"RAM เก็บข้อมูลชั่วคราว ส่วน Storage เก็บถาวร"],
+["d1","ข้อใดไม่ใช่อุปกรณ์จัดเก็บข้อมูล (Storage)",["RAM","HDD","SSD","Flash Drive"],"RAM เป็นหน่วยความจำหลัก ไม่ใช่ Storage"],
+["d1","คอมพิวเตอร์ประเภทใดทำหน้าที่ให้บริการเว็บไซต์ ไฟล์ และฐานข้อมูลในเครือข่าย",["เซิร์ฟเวอร์ (Server)","เดสก์ท็อป","แล็ปท็อป","แท็บเล็ต"],"Server ให้บริการทรัพยากรในเครือข่าย"],
+["d1","พอร์ตใดส่งทั้งภาพและเสียงคุณภาพสูง",["HDMI","VGA","Ethernet","DVI"],"HDMI ส่งภาพและเสียงคุณภาพสูง ส่วน VGA และ DVI ส่งเฉพาะภาพ"],
+["d1","พอร์ต VGA ส่งสัญญาณภาพแบบใด",["อนาล็อก","ดิจิทัล","ไร้สาย","อินฟราเรด"],"VGA เป็นภาพแบบอนาล็อก ส่วน DVI เป็นดิจิทัล"],
+["d1","พอร์ตใดใช้เชื่อมต่อเครือข่ายแบบมีสาย",["Ethernet","HDMI","USB","DVI"],"Ethernet ใช้กับเครือข่ายมีสาย (LAN)"],
+["d1","คำสั่งใดบันทึกสถานะลงดิสก์แล้วปิดเครื่อง ใช้ไฟน้อยกว่า Sleep",["Hibernate","Sleep","Restart","Shutdown"],"Hibernate เหมาะเมื่อไม่ใช้งานนาน"],
+["d1","ถ้าเครื่องค้างและต้องการปิดแล้วเปิดใหม่เพื่อแก้ปัญหา ควรใช้คำสั่งใด",["Restart","Sleep","Hibernate","Lock"],"Restart ปิดและเปิดเครื่องใหม่"],
+["d1","ระบบปฏิบัติการใดมีข้อจำกัดว่าใช้ได้เฉพาะอุปกรณ์ Apple",["iOS","Android","Linux","Windows"],"iOS ปรับแต่งได้น้อยและใช้เฉพาะอุปกรณ์ Apple"],
+["d1","จุดเด่นของ Linux คือข้อใด",["ฟรี ยืดหยุ่น ปลอดภัย","รองรับโปรแกรมมากที่สุด","ใช้ได้เฉพาะมือถือ","ราคาสูงแต่เสถียร"],"Linux ฟรีและยืดหยุ่น แต่ใช้ยากกว่า"],
+["d1","ISP คือใคร",["ผู้ให้บริการอินเทอร์เน็ตผ่านสาย เช่น 3BB","ผู้ผลิตคอมพิวเตอร์","โปรแกรมป้องกันไวรัส","ระบบปฏิบัติการ"],"ISP ย่อมาจาก Internet Service Provider"],
+["d1","อุปกรณ์ใดเชื่อมต่อเครือข่ายของผู้ให้บริการเข้าสู่บ้าน",["โมเด็ม (Modem)","เราเตอร์ (Router)","การ์ดเครือข่าย","เว็บแคม"],"ลำดับคือ โมเด็ม → เราเตอร์ → การ์ดเครือข่าย"],
+["d1","แบนด์วิธ (Bandwidth) วัดเป็นหน่วยใด",["Mbps / Gbps","GB / TB","GHz","dpi"],"แบนด์วิธคือปริมาณข้อมูลที่ส่งได้ต่อวินาที"],
+["d1","ข้อใดไม่ใช่ปัจจัยที่มีผลต่อความเร็วอินเทอร์เน็ต",["สีของเราเตอร์","จำนวนผู้ใช้ในเครือข่าย","ระยะห่างจากเราเตอร์","ช่วงเวลาใช้งาน"],"ปัจจัยได้แก่ แบนด์วิธ จำนวนผู้ใช้ สัญญาณ อุปกรณ์ และช่วงเวลา"],
+["d1","บัญชีผู้ใช้ประเภทใดมีสิทธิ์ติดตั้งโปรแกรมและเปลี่ยนการตั้งค่าระบบ",["Admin","User","Guest","Viewer"],"Admin มีสิทธิ์สูงกว่า User"],
+["d1","ไฟล์ที่ดาวน์โหลดจากเว็บมักถูกเก็บไว้ที่โฟลเดอร์ใดโดยค่าเริ่มต้น",["Downloads","Desktop","Documents","Recycle Bin"],"ตำแหน่งเริ่มต้นของไฟล์ดาวน์โหลดคือ Downloads"],
+["d1","Factory Reset มีผลอย่างไร",["คืนค่าโรงงานและลบข้อมูลในเครื่อง","สำรองข้อมูลขึ้นคลาวด์","อัปเดตระบบปฏิบัติการ","สร้างจุดคืนค่า"],"ควรสำรองข้อมูลก่อน Factory Reset"],
+["d1","รหัสผ่านใดปลอดภัยที่สุด",["Tq#8vLm2!pRz","12345678","password","ชื่อและวันเกิด"],"รหัสผ่านที่ดีต้องยาว ผสมตัวพิมพ์ ตัวเลข และสัญลักษณ์"],
+["d1","2FA คืออะไร",["การยืนยันตัวตน 2 ขั้นตอน","ไฟร์วอลล์ 2 ชั้น","การสำรองข้อมูล 2 ที่","การเข้ารหัสเว็บไซต์"],"เช่น รหัสผ่าน + รหัส OTP"],
+["d1","มัลแวร์ที่แฝงตัวเป็นโปรแกรมที่ดูปลอดภัยเรียกว่าอะไร",["โทรจัน (Trojan)","ไฟร์วอลล์","VPN","Cookie"],"Trojan หลอกให้ผู้ใช้ติดตั้งเอง"],
+["d1","ซอฟต์แวร์ที่แอบติดตามการใช้งานโดยผู้ใช้ไม่รู้ เรียกว่าอะไร",["Surveillance Software","Troubleshooter","SaaS","Screensaver"],"ซอฟต์แวร์สอดแนมแอบเก็บข้อมูลการใช้งาน"],
+["d1","หน้าที่ของไฟร์วอลล์ (Firewall) คือข้อใด",["ป้องกันการเข้าถึงที่ไม่พึงประสงค์","เพิ่มความเร็วอินเทอร์เน็ต","สำรองข้อมูล","ซ่อมไฟล์เสีย"],"มีทั้งแบบฮาร์ดแวร์และซอฟต์แวร์"],
+["d1","เว็บไซต์ธนาคารควรใช้โปรโตคอลใดเพื่อเข้ารหัสข้อมูล",["HTTPS","HTTP","FTP","SMS"],"HTTPS เข้ารหัสข้อมูลระหว่างเครื่องกับเว็บไซต์"],
+["d1","VPN มีวัตถุประสงค์หลักอย่างไร",["เชื่อมต่ออย่างปลอดภัยและปกปิดข้อมูลกับตำแหน่ง","เพิ่มพื้นที่เก็บข้อมูล","ส่งข้อความเสียง","ปรับความละเอียดจอ"],"VPN = Virtual Private Network"],
+["d1","SaaS คืออะไร",["แอปที่ใช้งานออนไลน์ผ่านอินเทอร์เน็ตโดยไม่ต้องติดตั้ง","ฮาร์ดดิสก์ภายนอก","ระบบปฏิบัติการมือถือ","พอร์ตเชื่อมต่อ"],"SaaS = Software as a Service"],
+["d1","ข้อใดเป็นประโยชน์ของการเก็บข้อมูลบนคลาวด์",["เข้าถึงได้ทุกที่และแชร์ง่าย","ใช้ได้โดยไม่ต้องมีอินเทอร์เน็ต","ไม่ต้องมีบัญชีผู้ใช้","เร็วกว่า RAM"],"คลาวด์ต้องมีบัญชีและอินเทอร์เน็ต"],
+["d2","คีย์ลัด Ctrl + Z ใช้ทำอะไร",["ยกเลิกการทำงานล่าสุด (Undo)","ทำซ้ำ (Redo)","ตัด (Cut)","ค้นหา (Find)"],"Ctrl + Y คือ Redo"],
+["d2","คีย์ลัดใดใช้ทำซ้ำ (Redo)",["Ctrl + Y","Ctrl + Z","Ctrl + R","Ctrl + V"],"Redo ทำซ้ำสิ่งที่เพิ่งยกเลิก"],
+["d2","คีย์ลัดใดใช้แทนที่ข้อความ (Replace)",["Ctrl + H","Ctrl + F","Ctrl + R","Ctrl + X"],"Ctrl + F ค้นหา, Ctrl + H แทนที่"],
+["d2","Ctrl + X ต่างจาก Ctrl + C อย่างไร",["Ctrl + X ลบข้อความจากตำแหน่งเดิม","Ctrl + X คัดลอกโดยไม่ลบ","Ctrl + X วางข้อความ","ไม่ต่างกัน"],"Cut ย้ายข้อความ ส่วน Copy คงต้นฉบับไว้"],
+["d2","GUI ย่อมาจากอะไร",["Graphical User Interface","General User Input","Graphic Utility Install","Global User Internet"],"ส่วนติดต่อผู้ใช้แบบภาพ เช่น ไอคอน เมนู"],
+["d2","ไฟล์จากแหล่งที่อาจไม่ปลอดภัยจะเปิดในมุมมองใด",["Protected View","Read-only","Print Preview","Slide Show"],"Protected View จำกัดการแก้ไขเพื่อลดความเสี่ยง"],
+["d2","มุมมอง Read-only หมายถึงอะไร",["ดูเนื้อหาได้แต่แก้ไขไม่ได้","แก้ไขได้ทุกอย่าง","ดูได้เฉพาะหน้าแรก","เปิดเฉพาะบนคลาวด์"],"Read-only คืออ่านอย่างเดียว"],
+["d2","ต้องการเห็นภาพรวมของเอกสารมากขึ้น ควรทำอย่างไร",["Zoom Out","Zoom In","Track Changes","Merge Cells"],"Zoom Out ย่อเพื่อดูภาพรวม"],
+["d2","ข้อใดเป็นการตั้งค่าหน้ากระดาษ (Page Setup)",["ขอบกระดาษ (Margins)","ตัวหนา","สีไฮไลต์","แบบอักษร"],"Page Setup: ขนาด, Margins, Header, Footer, เลขหน้า"],
+["d2","นามสกุลไฟล์ใดเป็นเทมเพลตของ Word",[".dotx",".docx",".pdf",".pptx"],".dotx ใช้เป็นต้นแบบเอกสาร"],
+["d2","ไฟล์ .pdf เหมาะกับงานใด",["อ่านหรือพิมพ์","แก้ไขเอกสารร่วมกัน","คำนวณตัวเลข","ทำแอนิเมชัน"],".pdf เป็นไฟล์สำหรับอ่านหรือพิมพ์"],
+["d2","เครื่องมือใดใช้ติดตามและยอมรับหรือปฏิเสธการแก้ไขในเอกสาร",["Track Changes","Print Preview","Zoom","Slide Layout"],"อยู่ในแท็บ Review"],
+["d2","การกำหนดตำแหน่งข้อความให้ตรงกันในบรรทัดใช้เครื่องมือใด",["Tab","Line Spacing","Header","Merge Cells"],"การตั้ง Tab จัดข้อความให้ตรงแนว"],
+["d2","ก่อนพิมพ์ควรตรวจหน้าตาเอกสารด้วยอะไร",["Print Preview","Protected View","Track Changes","Presenter View"],"ดูตัวอย่างก่อนพิมพ์ช่วยลดการพิมพ์ผิด"],
+["d2","ในสเปรดชีต เซลล์ B2 หมายถึงอะไร",["คอลัมน์ B แถว 2","แถว B คอลัมน์ 2","ชีตที่ 2","สูตรที่ 2"],"คอลัมน์เป็นตัวอักษร แถวเป็นตัวเลข"],
+["d2","สูตรในสเปรดชีตต้องขึ้นต้นด้วยเครื่องหมายใด",["=","+","#","@"],"เช่น =SUM(C2:C3)"],
+["d2","ฟังก์ชันใดหาค่าเฉลี่ย",["=AVERAGE()","=SUM()","=COUNT()","=MIN()"],"AVERAGE หาค่าเฉลี่ย"],
+["d2","ฟังก์ชันใดนับจำนวนข้อมูล",["=COUNT()","=SUM()","=MAX()","=AVERAGE()"],"COUNT นับจำนวนข้อมูล"],
+["d2","ต้องการแสดงเฉพาะข้อมูลที่ต้องการในตาราง ควรใช้อะไร",["กรองข้อมูล (Filter)","จัดเรียง (Sort)","รวมเซลล์","Zoom"],"Filter ซ่อนข้อมูลที่ไม่ตรงเงื่อนไข"],
+["d2","การเรียงข้อมูลจากน้อยไปมากใช้คำสั่งใด",["Sort","Filter","Merge","Find"],"Sort จัดเรียงข้อมูล"],
+["d2","กราฟประเภทใดเหมาะแสดงสัดส่วนของส่วนประกอบในภาพรวม",["กราฟวงกลม (Pie)","กราฟเส้น (Line)","กราฟแท่ง (Bar)","ตาราง"],"Pie แสดงสัดส่วน"],
+["d2","กราฟประเภทใดเหมาะแสดงแนวโน้มตามช่วงเวลา",["กราฟเส้น (Line)","กราฟวงกลม (Pie)","Merge Cells","Record"],"Line แสดงแนวโน้ม"],
+["d2","ในฐานข้อมูล ข้อมูล 1 รายการ (1 แถว) เรียกว่าอะไร",["ระเบียน (Record)","เขตข้อมูล (Field)","ตาราง (Table)","เซลล์"],"Field คือหัวข้อมูล 1 คอลัมน์"],
+["d2","ในฐานข้อมูล หัวข้อมูล 1 คอลัมน์เรียกว่าอะไร",["เขตข้อมูล (Field)","ระเบียน (Record)","ชีต","สูตร"],"Record คือ 1 แถว"],
+["d2","Animation ต่างจาก Transition อย่างไร",["Animation คือการเคลื่อนไหวของวัตถุบนสไลด์","Animation คือเอฟเฟกต์ตอนเปลี่ยนสไลด์","Animation คือการเปลี่ยนธีม","ไม่ต่างกัน"],"Transition คือเอฟเฟกต์เมื่อเปลี่ยนสไลด์"],
+["d2","มุมมองใดให้ผู้นำเสนอเห็นบันทึกย่อขณะผู้ชมเห็นเฉพาะสไลด์",["Presenter View","Full Screen","Slide Sorter","Read-only"],"Presenter View เป็นมุมมองผู้นำเสนอ"],
+["d2","การสร้างสไลด์ที่มีเนื้อหาเหมือนสไลด์เดิมเรียกว่าอะไร",["Duplicate Slide","Reorder Slides","Delete Slide","Slide Layout"],"Duplicate คือทำสำเนาสไลด์"],
+["d2","ธีม (Theme) ใน PowerPoint กำหนดอะไร",["รูปแบบสีและตัวอักษร","ขนาดไฟล์","ลำดับสไลด์","ความเร็วแอนิเมชัน"],"Theme กำหนดสีและฟอนต์ทั้งงานนำเสนอ"],
+["d3","Chrome, Edge, Firefox จัดเป็นโปรแกรมประเภทใด",["เบราว์เซอร์ (Web Browser)","ระบบปฏิบัติการ","ผู้ให้บริการอีเมล","ไฟร์วอลล์"],"เบราว์เซอร์ใช้เข้าถึงเว็บไซต์"],
+["d3","Creative Commons (CC) เกี่ยวข้องกับเรื่องใด",["การอนุญาตใช้สิทธิ์ (License)","การเซ็นเซอร์","การกลั่นแกล้งทางไซเบอร์","ไวรัส"],"CC กำหนดเงื่อนไขการใช้ผลงาน"],
+["d3","การนำผลงานผู้อื่นมาใช้โดยไม่อ้างอิงแหล่งที่มาเรียกว่าอะไร",["Plagiarism","Censorship","Copyright","Streaming"],"ถือเป็นการละเมิดจริยธรรมทางวิชาการ"],
+["d3","การควบคุมหรือจำกัดการเข้าถึงข้อมูลบางประเภทบนอินเทอร์เน็ตเรียกว่าอะไร",["การเซ็นเซอร์ (Censorship)","ลิขสิทธิ์","Plagiarism","Netiquette"],"Censorship คือการจำกัดการเข้าถึงข้อมูล"],
+["d3","ข้อใดเป็นทรัพย์สินทางปัญญา",["เพลงที่แต่งขึ้นเอง","โต๊ะทำงาน","อากาศ","ถนนสาธารณะ"],"ทรัพย์สินทางปัญญาเกิดจากความคิดสร้างสรรค์"],
+["d3","ต้องการส่งอีเมลถึงหลายคนโดยไม่ให้เห็นรายชื่อกัน ควรใส่ในช่องใด",["Bcc","Cc","To","Subject"],"Bcc คือผู้รับสำเนาลับ"],
+["d3","ช่อง Cc ในอีเมลหมายถึงอะไร",["ผู้รับสำเนา ที่ผู้รับคนอื่นเห็นชื่อ","ผู้รับหลัก","ผู้รับสำเนาลับ","หัวเรื่อง"],"To = ผู้รับหลัก, Cc = สำเนา, Bcc = สำเนาลับ"],
+["d3","ลายเซ็นอีเมล (Signature) ช่วยเรื่องใด",["ความน่าเชื่อถือและความเป็นมืออาชีพ","ลดขนาดไฟล์แนบ","ป้องกันไวรัส","เพิ่มความเร็วการส่ง"],"มีชื่อ ตำแหน่ง และช่องทางติดต่อ"],
+["d3","ก่อนแนบไฟล์ในอีเมลควรตรวจสอบอะไร",["ขนาดและชนิดไฟล์ตามที่กำหนด","สีของไฟล์","วันที่สร้างคอมพิวเตอร์","ความเร็วเมาส์"],"บางระบบจำกัดขนาดและชนิดไฟล์"],
+["d3","Gmail, Outlook, Yahoo Mail คืออะไร",["ผู้ให้บริการอีเมล","เบราว์เซอร์","โซเชียลมีเดีย","ระบบปฏิบัติการ"],"เป็น Email Service"],
+["d3","ฟีเจอร์ใดใช้นัดหมายและเชิญผู้เข้าร่วมประชุม",["ปฏิทิน (Calendar)","Contacts","Signature","Attachment"],"Calendar จัดตารางเวลาและตั้งเตือน"],
+["d3","Netiquette หมายถึงอะไร",["มารยาทในการสื่อสารและประชุมออนไลน์","ซอฟต์แวร์ประชุม","ไวรัสชนิดหนึ่ง","ความเร็วเครือข่าย"],"Net + Etiquette"],
+["d3","ข้อใดเป็นเครื่องมือประชุมออนไลน์",["Zoom","Excel","Firefox","VGA"],"เช่น Zoom, Google Meet, Microsoft Teams"],
+["d3","การส่งข้อความหรือโพสต์เพื่อทำให้ผู้อื่นอับอายทางออนไลน์เรียกว่าอะไร",["Cyberbullying","Streaming","Netiquette","Plagiarism"],"การกลั่นแกล้งทางไซเบอร์มีผลกระทบต่อผู้ถูกกระทำ"],
+["d3","การถ่ายทอดสด (Live) จัดเป็นรูปแบบใด",["Streaming","Attachment","Voicemail","Censorship"],"Streaming ส่งภาพและเสียงแบบต่อเนื่อง"],
+["d3","ข้อใดเป็นการดูแลสุขภาพดิจิทัล (Digital Health)",["พักสายตาและจัดเวลาใช้งาน","เล่นมือถือก่อนนอนนาน ๆ","นั่งหลังงอหน้าจอทั้งวัน","ปิดการแจ้งเตือนทั้งหมดตลอดไป"],"ปรับท่าทาง พักสายตา จัดเวลาใช้งาน"],
+["d3","พลเมืองดิจิทัล (Digital Citizenship) ที่ดีควรทำอย่างไร",["ใช้เทคโนโลยีอย่างมีจริยธรรมและเคารพสิทธิผู้อื่น","แชร์ข่าวทันทีโดยไม่ตรวจสอบ","ใช้รูปผู้อื่นโดยไม่ขออนุญาต","เปิดเผยรหัสผ่านให้เพื่อน"],"มีจริยธรรม เคารพสิทธิ และรับผิดชอบ"],
+["d3","การปกป้องตัวตนออนไลน์ (Online Identity) ทำได้อย่างไร",["ไม่เปิดเผยข้อมูลส่วนบุคคลเกินจำเป็น","โพสต์เลขบัตรประชาชน","ใช้รหัสผ่านเดียวทุกเว็บ","รับเพื่อนทุกคนที่ไม่รู้จัก"],"สร้างภาพลักษณ์ที่เหมาะสมและปกป้องข้อมูล"],
+["d3","ความเสี่ยงของการใช้โซเชียลมีเดียตามสรุปคือข้อใด",["ข่าวปลอมและภัยออนไลน์","ประหยัดไฟ","เครื่องเร็วขึ้น","ได้แบนด์วิธเพิ่ม"],"ต้องรู้เท่าทันข่าวปลอมและภัยออนไลน์"],
+["ai","หลัก Do No Harm หมายถึงอะไร",["ใช้ AI โดยไม่ก่อให้เกิดอันตรายต่อมนุษย์","ใช้ AI ให้เร็วที่สุด","ห้ามใช้ AI ทุกกรณี","ให้ AI ตัดสินใจแทนมนุษย์"],"ลดความเสี่ยงทั้งทางร่างกาย จิตใจ และสังคม"],
+["ai","หลักใดเน้นว่ามนุษย์ยังเป็นผู้ตัดสินใจหลักและควบคุม AI",["Human Agency and Oversight","Sustainability","Appropriateness","Ethics by Design"],"AI เป็นเครื่องมือเสริม ไม่ใช่ทดแทนมนุษย์"],
+["ai","หลัก Non-discrimination เน้นเรื่องใด",["ไม่เลือกปฏิบัติและหลีกเลี่ยงอคติ","ประหยัดพลังงาน","อธิบายผลลัพธ์ได้","ใช้ตามกฎหมายลิขสิทธิ์"],"ส่งเสริมความเท่าเทียมและความหลากหลาย"],
+["ai","หลัก Sustainability ของ AI เกี่ยวกับข้อใด",["คำนึงถึงผลกระทบต่อสิ่งแวดล้อมและสังคมระยะยาว","ความเร็วการประมวลผล","ราคาของซอฟต์แวร์","จำนวนผู้ใช้"],"เช่น ใช้พลังงานคุ้มค่า ลดของเสีย"],
+["ai","หลัก Transparency and Explainability หมายถึงอะไร",["อธิบายได้ว่า AI ทำงานอย่างไรและเหตุผลของผลลัพธ์","ซ่อนวิธีการทำงานของ AI","ให้ AI ทำงานโดยไม่มีคนดูแล","ใช้ AI เฉพาะในองค์กร"],"เปิดเผยข้อมูลที่เกี่ยวข้องอย่างชัดเจน"],
+["ai","Ethics by Design หมายถึงอะไร",["ออกแบบ AI โดยคำนึงถึงจริยธรรมตั้งแต่ต้นและตลอดวงจรชีวิต","ตรวจจริยธรรมหลังเปิดใช้แล้วเท่านั้น","ออกแบบหน้าตา AI ให้สวย","ให้ผู้ใช้ออกแบบ AI เอง"],"รวมถึงความหลากหลาย ความเท่าเทียม และการเข้าถึง"],
+["ai","สาเหตุสำคัญที่ทำให้ AI มีอคติ (Bias) คืออะไร",["ข้อมูลที่ใช้ฝึก AI","ความเร็วอินเทอร์เน็ต","ขนาดหน้าจอ","สีของอินเทอร์เฟซ"],"ข้อมูลฝึกที่ไม่สมดุลทำให้ผลลัพธ์ไม่เป็นธรรม"],
+["ai","เมื่อได้ข้อมูลจาก AI ควรทำอย่างไร",["ตรวจสอบความถูกต้องและอ้างอิงแหล่งที่มา","เชื่อทันทีเพราะ AI ไม่ผิด","คัดลอกส่งงานโดยไม่ตรวจ","ลบทิ้งทุกครั้ง"],"เป็นส่วนหนึ่งของการใช้ AI อย่างรับผิดชอบ"],
+["ai","การใช้ข้อมูลส่วนบุคคลกับ AI ที่เหมาะสมคือข้อใด",["ใช้เมื่อได้รับความยินยอมและตามวัตถุประสงค์","ใช้ข้อมูลใครก็ได้ที่หาเจอ","แชร์ข้อมูลเพื่อนให้ AI วิเคราะห์โดยไม่บอก","เผยแพร่ข้อมูลสาธารณะทั้งหมด"],"เคารพความเป็นส่วนตัว (Privacy)"],
+["ai","Machine Learning คืออะไร",["การเรียนรู้ของเครื่องจากข้อมูล","อุปกรณ์ต่อพ่วง","โปรแกรมพิมพ์เอกสาร","การเชื่อมต่อไร้สาย"],"เป็นหลักการทำงานเบื้องต้นของ AI"],
+["ai","คำสั่งที่ผู้ใช้พิมพ์ให้ AI สร้างผลลัพธ์เรียกว่าอะไร",["Prompt","Plugin","Patch","Port"],"Prompt ที่ชัดเจนให้ผลลัพธ์ดีกว่า"],
+["ai","ข้อใดเป็นการประยุกต์ใช้ AI ในบทบาทครูตามสรุป",["ใช้ AI ช่วยวางแผน สอน ประเมิน และให้ข้อมูลย้อนกลับ","ให้ AI สอบแทนนักเรียน","ให้ AI ตัดเกรดโดยไม่ตรวจ","ห้ามนักเรียนใช้ AI"],"AI ช่วยงานครู แต่ครูยังตรวจสอบเอง"],
+["ai","การประเมินผลการใช้ AI ควรพิจารณาอะไร",["คุณภาพ ความถูกต้อง และความน่าเชื่อถือของผลลัพธ์","ความสวยของหน้าจอ","ชื่อเสียงของบริษัทเท่านั้น","ความยาวของคำตอบ"],"แล้วนำไปปรับปรุงการใช้งานต่อเนื่อง"],
+["ai","หลัก Appropriateness หมายถึงอะไร",["ใช้ AI ให้เหมาะกับวัตถุประสงค์ บริบท และกลุ่มเป้าหมาย","ใช้ AI ทุกงานโดยไม่เลือก","ใช้เฉพาะ AI ที่ราคาแพง","ใช้ AI ทำเรื่องผิดกฎหมายได้ถ้าไม่มีใครรู้"],"หลีกเลี่ยงการใช้ในเรื่องที่ไม่เหมาะสมหรือผิดกฎหมาย"]
+];
+
+const $=s=>document.querySelector(s);
+const K=["ก","ข","ค","ง"];
+let quiz=[],i=0,score=0,wrong=[];
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+function shuffle(a){a=a.slice();for(let j=a.length-1;j>0;j--){const r=Math.floor(Math.random()*(j+1));[a[j],a[r]]=[a[r],a[j]]}return a}
+
+function initTopics(){
+  const sel=$("#topic");
+  const counts={};BANK.forEach(q=>counts[q[0]]=(counts[q[0]]||0)+1);
+  sel.innerHTML=`<option value="all">ทุกหมวด (${BANK.length} ข้อ)</option>`+Object.keys(T).map(k=>`<option value="${k}">${T[k]} (${counts[k]} ข้อ)</option>`).join("");
+}
+
+function start(){
+  const t=$("#topic").value,n=+$("#count").value;
+  const pool=BANK.filter(q=>t==="all"||q[0]===t);
+  quiz=shuffle(pool).slice(0,Math.min(n,pool.length)).map(q=>{
+    const opts=shuffle(q[2].map((text,idx)=>({text,ok:idx===0})));
+    return {topic:q[0],q:q[1],opts,ex:q[3],picked:null};
+  });
+  i=0;score=0;wrong=[];render();
+}
+
+function progress(){
+  $("#progress").innerHTML=quiz.map((q,idx)=>{
+    const c=q.picked===null?(idx===i?"cur":""):(q.opts[q.picked].ok?"ok":"bad");
+    return `<span class="${c}"></span>`}).join("");
+  $("#pos").textContent=i<quiz.length?`ข้อ ${i+1} / ${quiz.length}`:`ครบ ${quiz.length} ข้อ`;
+  $("#live").textContent=`ถูก ${score}`;
+}
+
+function render(){
+  progress();
+  if(i>=quiz.length)return finish();
+  const q=quiz[i];
+  $("#stage").innerHTML=`<div class="card">
+    <span class="tag">${T[q.topic]}</span>
+    <p class="q">${q.q}</p>
+    <div class="opts">${q.opts.map((o,idx)=>`<button class="opt" id="opt${idx}" data-i="${idx}"><span class="k">${K[idx]}</span><span>${o.text}</span></button>`).join("")}</div>
+    <div id="fb"></div>
+  </div>`;
+  document.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>pick(+b.dataset.i)));
+}
+
+function pick(idx){
+  const q=quiz[i];if(q.picked!==null)return;
+  q.picked=idx;const ok=q.opts[idx].ok;if(ok)score++;else wrong.push(q);
+  document.querySelectorAll(".opt").forEach((b,j)=>{b.disabled=true;if(q.opts[j].ok)b.classList.add("ok");else if(j===idx)b.classList.add("bad")});
+  const right=q.opts.findIndex(o=>o.ok);
+  $("#fb").innerHTML=`<div class="explain"><b class="${ok?"ok":"bad"}">${ok?"ถูกต้อง":"ยังไม่ถูก · คำตอบคือ "+K[right]}</b> ${q.ex}</div>
+    <div class="nav"><button class="btn" id="next">${i+1<quiz.length?"ข้อถัดไป":"ดูผลคะแนน"}</button></div>`;
+  progress();
+  const nx=$("#next");nx.focus();nx.addEventListener("click",()=>{i++;render()});
+}
+
+function finish(){
+  const pct=Math.round(score/quiz.length*100);
+  const best=Math.max(pct,+(store.get("ic3best")||0));store.set("ic3best",best);
+  const msg=pct>=80?"พร้อมสอบแล้ว":pct>=60?"ใกล้แล้ว ทบทวนข้อที่ผิดอีกรอบ":"ลองทบทวนสรุปแล้วสุ่มชุดใหม่";
+  $("#stage").innerHTML=`<div class="card result">
+    <div class="score">${score}/${quiz.length}</div>
+    <p class="q">${pct}% · ${msg}</p>
+    ${wrong.length?`<div class="review">${wrong.map(q=>`<div><b>${q.q}</b><br>คำตอบ: ${q.opts.find(o=>o.ok).text}</div>`).join("")}</div>`:""}
+    <button class="btn" id="again">สุ่มชุดใหม่</button>
+  </div>`;
+  $("#again").addEventListener("click",start);
+  showBest();
+}
+function showBest(){const b=store.get("ic3best");$("#best").textContent=b?`คะแนนดีที่สุดในเครื่องนี้: ${b}%`:""}
+
+initTopics();$("#start").addEventListener("click",start);showBest();start();
+</script>
+
+</body></html>
